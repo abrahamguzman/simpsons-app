@@ -68,7 +68,6 @@ public class CharactersActivity extends AppCompatActivity {
             return;
         }
 
-        // Precarga inicial de personajes si la base aun esta vacia.
         Character homero = new Character(1, "Homer Simpson", 39, "1956-05-12", "homer.png", "Safety Inspector", "Active");
         Character marge = new Character(2, "Marge Simpson", 36, "1956-10-01", "marge.png", "Housewife", "Active");
         Character bart = new Character(3, "Bart Simpson", 10, "1980-02-23", "bart.png", "Student", "Active");
@@ -125,7 +124,7 @@ public class CharactersActivity extends AppCompatActivity {
         ArrayList<Character> characters = characterDao.getAll();
         ArrayList<String> dataList = new ArrayList<>();
         for (Character character : characters) {
-            dataList.add(character.getName() + " - " + character.getOccupation());
+            dataList.add(character.getName() + " - " + character.getOccupation() + " - " + character.getAge());
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
