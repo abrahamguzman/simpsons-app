@@ -1,25 +1,21 @@
 package com.dev.simpsonapi.dao;
 
-import android.content.ContentValues;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
 
-import com.dev.simpsonapi.db.DbHelper;
 import com.dev.simpsonapi.db.Episode;
 
-public class EpisodeDao {
-    private DbHelper  dbHelper;
+import java.util.List;
 
-    public EpisodeDao(DbHelper dbHelper){
-        this.dbHelper=dbHelper;
-    }
+@Dao
+public interface EpisodeDao {
+    @Query("SELECT * FROM episodes")
+    List<Episode> getAll();
 
-    public void insert (Episode episode){
-        ContentValues values = new ContentValues();
+    @Insert
+    void insert(Episode episode);
 
-        values.put("id",episode.getId());
-        values.put("airDate",episode.)
-    }
-
-
-
-
+    @Query("DELETE FROM episodes")
+    void deleteAll();
 }
