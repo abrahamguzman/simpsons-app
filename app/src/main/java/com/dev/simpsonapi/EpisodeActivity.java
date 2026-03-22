@@ -17,6 +17,8 @@ import com.dev.simpsonapi.db.AppDatabase;
 import com.dev.simpsonapi.db.Episode;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class EpisodeActivity extends AppCompatActivity {
 
@@ -29,6 +31,8 @@ public class EpisodeActivity extends AppCompatActivity {
     AppDatabase db;
     EpisodeDao episodeDao;
     Button btnSaveData;
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +63,13 @@ public class EpisodeActivity extends AppCompatActivity {
     }
 
     private void seedEpisodesIfEmpty() {
-        if (!episodeDao.getAll().isEmpty()) {
-            return;
-        }
-        db.episodeDao().insert(new Episode("December 17, 1989", 13, "Simpsons Roasting on an Open Fire", 2, "The Simpsons' first Christmas special."));
-        db.episodeDao().insert(new Episode("January 14, 1990", 1, "Bart the Genius", 2, "Bart is sent to a school for gifted children."));
+        executor.execute(() -> {
+            if (!episodeDao.getAll().isEmpty()) {
+                return;
+            }
+            db.episodeDao().insert(new Episode("December 17, 1989", 13, "Simpsons Roasting on an Open Fire", 2, "The Simpsons' first Christmas special."));
+            db.episodeDao().insert(new Episode("January 14, 1990", 1, "Bart the Genius", 2, "Bart is sent to a school for gifted children."));
+        });
     }
 
     private void saveEpisodeFromForm() {
@@ -74,17 +80,25 @@ public class EpisodeActivity extends AppCompatActivity {
         String synopsis = etSynopsis.getText().toString();
 
         Episode episode = new Episode(airDate, episodeNumber, name, season, synopsis);
-        episodeDao.insert(episode);
-        loadEpisodes();
+
+        executor.execute(() -> {
+            episodeDao.insert(episode);
+            runOnUiThread(this::loadEpisodes);
+        });
     }
 
     private void loadEpisodes() {
-        ArrayList<Episode> episodes = (ArrayList<Episode>) episodeDao.getAll();
-        ArrayList<String> dataList = new ArrayList<>();
-        for (Episode episode : episodes) {
-            dataList.add("S" + episode.season + "E" + episode.episodeNumber + ": " + episode.name + " (" + episode.airDate + ")");
-        }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
-        listView.setAdapter(adapter);
+        executor.execute(() -> {
+            ArrayList<Episode> episodes = (ArrayList<Episode>) episodeDao.getAll();
+
+            runOnUiThread(() -> {
+                ArrayList<String> dataList = new ArrayList<>();
+                for (Episode episode : episodes) {
+                    dataList.add("S" + episode.season + "E" + episode.episodeNumber + ": " + episode.name + " (" + episode.airDate + ")");
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
+                listView.setAdapter(adapter);
+            });
+        });
     }
 }
