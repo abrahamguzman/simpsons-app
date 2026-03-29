@@ -49,31 +49,14 @@ public class EpisodeActivity extends AppCompatActivity {
         db = AppDatabase.getDatabase(this);
         episodeDao = db.episodeDao();
 
-        etAirDate = findViewById(R.id.etAirDate);
-        etEpisodeNumber = findViewById(R.id.etEpisodeNumber);
-        etName = findViewById(R.id.etName);
-        etSeason = findViewById(R.id.etSeason);
-        etSynopsis = findViewById(R.id.etSynopsis);
-        listView = findViewById(R.id.list_episodes_data);
-
-        seedEpisodesIfEmpty();
-        loadEpisodes();
+        initViews();
+        initObservers();
 
         btnSaveData = findViewById(R.id.btnSaveData);
         btnSaveData.setOnClickListener(v -> saveEpisodeFromForm());
 
         btnDeleteData = findViewById(R.id.btnDeleteData);
         btnDeleteData.setOnClickListener(v -> deleteEpisode());
-    }
-
-    private void seedEpisodesIfEmpty() {
-        executor.execute(() -> {
-            if (!episodeDao.getAll().isEmpty()) {
-                return;
-            }
-            db.episodeDao().insert(new Episode("December 17, 1989", 13, "Simpsons Roasting on an Open Fire", 2, "The Simpsons' first Christmas special."));
-            db.episodeDao().insert(new Episode("January 14, 1990", 1, "Bart the Genius", 2, "Bart is sent to a school for gifted children."));
-        });
     }
 
     private void saveEpisodeFromForm() {
@@ -87,11 +70,10 @@ public class EpisodeActivity extends AppCompatActivity {
 
         executor.execute(() -> {
             episodeDao.insert(episode);
-            runOnUiThread(this::loadEpisodes);
         });
     }
 
-    private void loadEpisodes() {
+/*    private void loadEpisodes() {
         executor.execute(() -> {
             ArrayList<Episode> episodes = (ArrayList<Episode>) episodeDao.getAll();
 
@@ -104,12 +86,31 @@ public class EpisodeActivity extends AppCompatActivity {
                 listView.setAdapter(adapter);
             });
         });
+    }*/
+
+    private void initViews() {
+        etAirDate = findViewById(R.id.etAirDate);
+        etEpisodeNumber = findViewById(R.id.etEpisodeNumber);
+        etName = findViewById(R.id.etName);
+        etSeason = findViewById(R.id.etSeason);
+        etSynopsis = findViewById(R.id.etSynopsis);
+        listView = findViewById(R.id.list_episodes_data);
+    }
+
+    private void initObservers() {
+        episodeDao.getAll().observe(this, episodes -> {
+            ArrayList<String> dataList = new ArrayList<>();
+            for (Episode episode : episodes) {
+                dataList.add("S" + episode.season + "E" + episode.episodeNumber + ": " + episode.name + " (" + episode.airDate + ")");
+            }
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
+            listView.setAdapter(adapter);
+        });
     }
 
     private void deleteEpisode() {
         executor.execute(() -> {
             episodeDao.deleteAll();
-            runOnUiThread(this::loadEpisodes);
         });
     }
 }

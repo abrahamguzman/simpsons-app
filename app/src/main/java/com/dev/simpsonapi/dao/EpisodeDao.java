@@ -1,5 +1,6 @@
 package com.dev.simpsonapi.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -11,7 +12,7 @@ import java.util.List;
 @Dao
 public interface EpisodeDao {
     @Query("SELECT * FROM episodes")
-    List<Episode> getAll();
+    LiveData<List<Episode>> getAll();
 
     @Insert
     void insert(Episode episode);
