@@ -31,6 +31,7 @@ public class EpisodeActivity extends AppCompatActivity {
     AppDatabase db;
     EpisodeDao episodeDao;
     Button btnSaveData;
+    Button btnDeleteData;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -60,6 +61,9 @@ public class EpisodeActivity extends AppCompatActivity {
 
         btnSaveData = findViewById(R.id.btnSaveData);
         btnSaveData.setOnClickListener(v -> saveEpisodeFromForm());
+
+        btnDeleteData = findViewById(R.id.btnDeleteData);
+        btnDeleteData.setOnClickListener(v -> deleteEpisode());
     }
 
     private void seedEpisodesIfEmpty() {
@@ -99,6 +103,13 @@ public class EpisodeActivity extends AppCompatActivity {
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
                 listView.setAdapter(adapter);
             });
+        });
+    }
+
+    private void deleteEpisode() {
+        executor.execute(() -> {
+            episodeDao.deleteAll();
+            runOnUiThread(this::loadEpisodes);
         });
     }
 }

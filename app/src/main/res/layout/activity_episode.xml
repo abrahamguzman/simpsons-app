@@ -57,6 +57,14 @@
         android:layout_marginBottom="16dp"
         android:text="Guardar" />
 
+    <Button
+        android:id="@+id/btnDeleteData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Borrar todo" />
+
     <ListView
         android:id="@+id/list_episodes_data"
         android:layout_width="match_parent"
