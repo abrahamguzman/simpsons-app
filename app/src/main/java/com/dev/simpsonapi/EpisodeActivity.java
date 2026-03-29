@@ -1,22 +1,22 @@
 package com.dev.simpsonapi;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.dev.simpsonapi.dao.EpisodeDao;
 import com.dev.simpsonapi.db.AppDatabase;
 import com.dev.simpsonapi.db.Episode;
+import com.dev.simpsonapi.ui.EpisodeAdapter;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,11 +27,13 @@ public class EpisodeActivity extends AppCompatActivity {
     EditText etName;
     EditText etSeason;
     EditText etSynopsis;
-    ListView listView;
     AppDatabase db;
     EpisodeDao episodeDao;
     Button btnSaveData;
     Button btnDeleteData;
+
+    private RecyclerView recyclerView;
+    private EpisodeAdapter episodeAdapter;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -48,6 +50,8 @@ public class EpisodeActivity extends AppCompatActivity {
 
         db = AppDatabase.getDatabase(this);
         episodeDao = db.episodeDao();
+
+        setupRecyclerView();
 
         initViews();
         initObservers();
@@ -94,18 +98,20 @@ public class EpisodeActivity extends AppCompatActivity {
         etName = findViewById(R.id.etName);
         etSeason = findViewById(R.id.etSeason);
         etSynopsis = findViewById(R.id.etSynopsis);
-        listView = findViewById(R.id.list_episodes_data);
     }
 
     private void initObservers() {
         episodeDao.getAll().observe(this, episodes -> {
-            ArrayList<String> dataList = new ArrayList<>();
-            for (Episode episode : episodes) {
-                dataList.add("S" + episode.season + "E" + episode.episodeNumber + ": " + episode.name + " (" + episode.airDate + ")");
-            }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
-            listView.setAdapter(adapter);
+            episodeAdapter.setEpisodes(episodes);
         });
+    }
+
+    private void setupRecyclerView() {
+        recyclerView = findViewById(R.id.rvEpisodes);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        episodeAdapter = new EpisodeAdapter();
+        recyclerView.setAdapter(episodeAdapter);
     }
 
     private void deleteEpisode() {

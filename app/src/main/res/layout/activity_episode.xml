@@ -65,10 +65,16 @@
         android:layout_marginBottom="16dp"
         android:text="Borrar todo" />
 
-    <ListView
+    <!--    <ListView
         android:id="@+id/list_episodes_data"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1" />-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEpisodes"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
 
 </LinearLayout>
