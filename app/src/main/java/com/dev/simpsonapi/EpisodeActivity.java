@@ -3,12 +3,15 @@ package com.dev.simpsonapi;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,6 +55,7 @@ public class EpisodeActivity extends AppCompatActivity {
         episodeDao = db.episodeDao();
 
         setupRecyclerView();
+        setupSwipeToDelete();
 
         initViews();
         initObservers();
@@ -112,6 +116,29 @@ public class EpisodeActivity extends AppCompatActivity {
 
         episodeAdapter = new EpisodeAdapter();
         recyclerView.setAdapter(episodeAdapter);
+    }
+
+    private void setupSwipeToDelete() {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getBindingAdapterPosition();
+                Episode episode = episodeAdapter.getEpisodeAtPosition(position);
+                executor.execute(() -> {
+                    episodeDao.delete(episode);
+                });
+
+                Toast.makeText(EpisodeActivity.this, "Episodio eliminado", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     private void deleteEpisode() {

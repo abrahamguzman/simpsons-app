@@ -2,6 +2,7 @@ package com.dev.simpsonapi.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -19,4 +20,7 @@ public interface EpisodeDao {
 
     @Query("DELETE FROM episodes")
     void deleteAll();
+
+    @Delete
+    void delete(Episode episode);
 }

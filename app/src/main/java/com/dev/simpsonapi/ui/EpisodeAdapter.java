@@ -29,7 +29,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
     @Override
     public void onBindViewHolder(EpisodeViewHolder holder, int position) {
         Episode currentEpisode = episodes.get(position);
-        holder.itemName.setText(currentEpisode.name);
+
+        String title = "S" + currentEpisode.season + "E" + currentEpisode.episodeNumber + ": " + currentEpisode.name;
+
+        holder.itemTitle.setText(title);
         holder.itemSynopsis.setText(currentEpisode.synopsis);
     }
 
@@ -38,13 +41,17 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.EpisodeV
         return episodes.size();
     }
 
+    public Episode getEpisodeAtPosition(int position) {
+        return episodes.get(position);
+    }
+
     public static class EpisodeViewHolder extends RecyclerView.ViewHolder {
-        TextView itemName;
+        TextView itemTitle;
         TextView itemSynopsis;
 
         public EpisodeViewHolder(View itemView) {
             super(itemView);
-            itemName = itemView.findViewById(android.R.id.text1);
+            itemTitle = itemView.findViewById(android.R.id.text1);
             itemSynopsis = itemView.findViewById(android.R.id.text2);
         }
     }
